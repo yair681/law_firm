@@ -463,6 +463,75 @@
              width: 20px;
              text-align: center;
          }
+         
+         /* Keyboard Guide Styles - נדרשים כדי להציג את המדריך רק בלחיצה */
+         .keyboard-guide {
+             position: fixed;
+             top: 50%;
+             left: 50%;
+             transform: translate(-50%, -50%);
+             background: white;
+             border-radius: 15px;
+             padding: 2rem;
+             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+             z-index: 1003;
+             width: 350px;
+             max-width: 90%;
+             display: none;
+             text-align: right;
+             direction: rtl;
+         }
+
+         .keyboard-guide.active {
+             display: block;
+         }
+
+         .close-guide {
+             position: absolute;
+             top: 10px;
+             left: 10px;
+             background: none;
+             border: none;
+             font-size: 1.5rem;
+             cursor: pointer;
+             color: #333;
+         }
+
+         .keyboard-guide h3 {
+             margin-top: 0;
+             margin-bottom: 1.5rem;
+             color: #2c3e50;
+             font-size: 1.8rem;
+         }
+
+         .keyboard-shortcut {
+             display: flex;
+             justify-content: space-between;
+             margin-bottom: 1rem;
+             border-bottom: 1px dashed #ccc;
+             padding-bottom: 0.5rem;
+         }
+
+         .keyboard-shortcut span:first-child {
+             font-weight: bold;
+             color: #f39c12;
+         }
+         
+         .overlay {
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             background: rgba(0, 0, 0, 0.5);
+             z-index: 1002;
+             display: none;
+         }
+         
+         .overlay.active {
+             display: block;
+         }
+
 
         /* Footer */
         footer {
@@ -507,6 +576,24 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        /* Skip Link Style (חשוב לנגישות) */
+        .skip-link {
+             position: absolute;
+             top: -40px;
+             left: 0;
+             background: #2c3e50;
+             color: white;
+             padding: 8px;
+             z-index: 9999;
+             text-decoration: none;
+             transition: top 0.3s ease;
+             border-radius: 0 0 5px 0;
+         }
+
+         .skip-link:focus {
+             top: 0;
+         }
     </style>
 </head>
 <body>
@@ -569,7 +656,6 @@
             <span>יציאה/ביטול</span>
         </div>
     </div>
-
     <div class="overlay" id="overlay" onclick="closeKeyboardGuide()"></div>
     
     <a href="https://wa.me/9725XXXXXXX?text=שלום%20עורך%20הדין,%20אני%20מעוניין%20בייעוץ%20משפטי" target="_blank" class="whatsapp-float" aria-label="צור קשר בוואצאפ" rel="noopener noreferrer">
@@ -808,8 +894,6 @@
             savePreference('highContrast', document.body.classList.contains('high-contrast'));
         }
         
-        // [כל פונקציות הנגישות האחרות שלך: toggleGrayscale, toggleLargeText, toggleFocusHighlight, toggleLargeCursor, showKeyboardGuide, closeKeyboardGuide, resetAccessibility, savePreference, loadPreferences, ו-addEventListener ל-Esc] הועתקו במלואן.
-        
         function toggleGrayscale() {
             document.body.classList.toggle('grayscale');
             document.getElementById('grayscaleOption').classList.toggle('active');
@@ -833,11 +917,13 @@
             document.getElementById('largeCursorOption').classList.toggle('active');
             savePreference('largeCursor', document.body.classList.contains('large-cursor'));
         }
-
+        
+        // פונקציות הצגת והסתרת מדריך המקלדת
         function showKeyboardGuide() {
             document.getElementById('keyboardGuide').classList.add('active');
             document.getElementById('overlay').classList.add('active');
-            toggleAccessibilityPanel();
+            // סגירת פאנל הנגישות כשהמדריך נפתח
+            document.getElementById('accessibilityPanel').classList.remove('active'); 
             document.getElementById('keyboardGuide').focus();
         }
 
@@ -886,7 +972,8 @@
                 }
             }
         }
-
+        
+        // ניווט במקלדת - מגיב למקש Esc לסגירת חלונות קופצים
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 document.getElementById('accessibilityPanel').classList.remove('active');
@@ -898,7 +985,7 @@
             loadPreferences();
         });
 
-        // Scroll Functions (הועתקו מהקוד שלך)
+        // Scroll Functions
         function scrollToSection(sectionId) {
             const element = document.getElementById(sectionId);
             const headerOffset = 80;
